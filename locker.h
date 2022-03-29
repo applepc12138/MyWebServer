@@ -4,6 +4,8 @@
 	> Mail: lc1030244043@outlook.com 
 	> Created Time: 2021年01月21日 星期四 18时27分41秒
  ************************************************************************/
+#ifndef LOCKER_H
+#define LOCKER_H
 
 #include <exception>
 #include <pthread.h>
@@ -21,8 +23,16 @@ public:
 		return pthread_mutex_lock(&mutex) == 0;
 	}
 
+	bool trylock(){
+		return pthread_mutex_trylock(&mutex) == 0;
+	}
+
 	bool unlock(){
 		return pthread_mutex_unlock(&mutex) == 0;
+	}
+
+	pthread_mutex_t *get(){
+		return &mutex;
 	}
 
 	~locker(){
@@ -35,9 +45,7 @@ private:
 
 class sem{
 public:
-	sem(int shared = 0, unsigned int value = 0){
-		int ret = sem_init(&m_sem, shared, value);
-		if(ret != 0)
+	sem(int shared = 0, unsigned int value = 0){ int ret = sem_init(&m_sem, shared, value); if(ret != 0)
 			throw std::exception();
 	}
 
@@ -58,7 +66,7 @@ private:
 
 class cond{
 public:
-	cond(pthread_condattr_t *condattr){
+	cond(pthread_condattr_t *condattr = nullptr){
 		int ret = pthread_cond_init(&m_cond, condattr);
 		if(ret != 0)
 			throw std::exception();
@@ -78,3 +86,5 @@ public:
 private:
 	pthread_cond_t m_cond;
 };
+
+#endif
