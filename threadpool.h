@@ -122,7 +122,7 @@ void threadpool<T>::run()
 		if(!task)//???
 			continue;
 		if(m_actor_model == 1){//reactor
-			if(task->m_state == 0){//http_conn类中，读为0，写为1
+			if(task->m_state == 0){//http_conn类中，读事件为0，写事件为1
 				if(task->read_once()){
 					task->improv = 1;//????
 					connectionRAII mysqlcon(&task->m_mysql, m_conn_pool);//是否多余????

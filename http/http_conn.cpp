@@ -453,6 +453,8 @@ void http_conn::unmap()
 	}
 }
 
+//process_write()并没有真正将数据发送至客户端，
+//只是将数据写入发送缓冲区中,真正的发送动作由write()完成
 bool http_conn::process_write(HTTP_CODE ret)
 {
 	switch(ret)
@@ -561,15 +563,21 @@ bool http_conn::write()
 	}
 }
 
+//process()不涉及数据的发送(write())与接收(read_once())，只进行数据的分析与处理
 void http_conn::process()
 {
+	//处理过程：
+	//此时已通过read_once()将数据接收到接收缓冲区m_readed_buf中
+	//process_read()对已接收数据进行分析和响应(do_request)
 	HTTP_CODE read_ret = process_read();
 	if(read_ret == NO_REQUEST){
 		utils::modfd(m_epollfd, m_socketfd, EPOLLIN, m_TRIGMode);
 		return;
 	}
+	//将需发送至客户端的数据写入发送缓冲区
 	bool write_ret = process_write(read_ret);
 	if(!write_ret)
 		close_conn();
+	//添加监听写事件
 	utils::modfd(m_epollfd, m_socketfd, EPOLLOUT, m_TRIGMode);
 }

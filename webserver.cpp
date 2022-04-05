@@ -141,13 +141,13 @@ void WebServer::create_listensocket_eventListen()
 	assert(ret >= 0);
 	ret = listen(m_listenfd, 5);
 	assert(ret >= 0);
-	utils::addfd(m_epollfd, m_listenfd, EPOLLIN, m_listenTrigmode, true);
 	
 
 	//epoll_event events[MAX_EVENT_NUM];
 	m_epollfd = epoll_create(5);
 	assert(m_epollfd != -1);
 	http_conn::m_epollfd = m_epollfd;
+	utils::addfd(m_epollfd, m_listenfd, EPOLLIN, m_listenTrigmode, true);
 	
 	//初始化定时任务链表
 	m_timerList = new TimerList(m_epollfd);
